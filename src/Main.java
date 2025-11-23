@@ -4,9 +4,10 @@ import udla.jgjbmp.pmeaabet.enums.Caducidad;
 import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.List;
+import java.util.Locale;
 
 void main() {
-    Scanner scanner = new Scanner(System.in);
+    Scanner scanner = new Scanner(System.in).useLocale(Locale.US);
     
     System.out.println("========================================");
     System.out.println("   SISTEMA DE GESTION DE INVENTARIOS");
