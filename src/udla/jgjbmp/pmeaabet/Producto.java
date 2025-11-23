@@ -17,6 +17,7 @@ public class Producto {
     private LocalDate fechaCaducidad;
     private double costoProducto;
     private Proveedor proveedor;
+    private double espacioAlmacenamiento;
     
     // Lista estática para almacenar todos los productos
     private static final List<Producto> listaProductos = new ArrayList<>();
@@ -28,7 +29,7 @@ public class Producto {
     // Constructor con parámetros
     public Producto(String nombreProducto, double precioProducto, int stockProducto, 
                    String codigoProducto, Tipo tipoProducto, Caducidad caducidadProducto, 
-                   LocalDate fechaCaducidad, double costoProducto, Proveedor proveedor) {
+                   LocalDate fechaCaducidad, double costoProducto, Proveedor proveedor, double espacioAlmacenamiento) {
         this.nombreProducto = nombreProducto;
         this.precioProducto = precioProducto;
         this.stockProducto = stockProducto;
@@ -38,6 +39,7 @@ public class Producto {
         this.fechaCaducidad = fechaCaducidad;
         this.costoProducto = costoProducto;
         this.proveedor = proveedor;
+        this.espacioAlmacenamiento = espacioAlmacenamiento;
     }
     
     // Getters y Setters
@@ -111,6 +113,14 @@ public class Producto {
     
     public void setProveedor(Proveedor proveedor) {
         this.proveedor = proveedor;
+    }
+    
+    public double getEspacioAlmacenamiento() {
+        return espacioAlmacenamiento;
+    }
+    
+    public void setEspacioAlmacenamiento(double espacioAlmacenamiento) {
+        this.espacioAlmacenamiento = espacioAlmacenamiento;
     }
     
     public static List<Producto> getListaProductos() {

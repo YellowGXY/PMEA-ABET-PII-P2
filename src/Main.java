@@ -17,6 +17,12 @@ void main() {
     Administrador.setPresupuesto(presupuestoInicial);
     System.out.println("Presupuesto registrado: $" + String.format("%.2f", presupuestoInicial));
     
+    System.out.print("Ingrese la capacidad de almacenamiento (litros): ");
+    double capacidadInicial = scanner.nextDouble();
+    scanner.nextLine();
+    Administrador.setCapacidadAlmacen(capacidadInicial);
+    System.out.println("Capacidad de almacenamiento registrada: " + String.format("%.2f", capacidadInicial) + " litros");
+    
     int opcionPrincipal;
 
     do {
@@ -169,9 +175,12 @@ void menuAdministracion(Scanner scanner) {
         System.out.println("         ADMINISTRACION");
         System.out.println("========================================");
         System.out.println("  Presupuesto actual: $" + String.format("%.2f", Administrador.getPresupuesto()));
+        System.out.println("  Almacenamiento: " + String.format("%.2f", Administrador.getEspacioOcupado()) + " / " + String.format("%.2f", Administrador.getCapacidadAlmacen()) + " litros");
+        System.out.println("  Espacio disponible: " + String.format("%.2f", Administrador.getEspacioDisponible()) + " litros");
         System.out.println("1. Vender Productos");
         System.out.println("2. Compra a Proveedor");
         System.out.println("3. Gestion de Proveedores");
+        System.out.println("4. Editar Capacidad de Almacenamiento");
         System.out.println("0. Volver al Menu Principal");
         System.out.println("========================================");
         System.out.print("Seleccione una opcion: ");
@@ -190,6 +199,10 @@ void menuAdministracion(Scanner scanner) {
             case 3:
                 menuGestionProveedores(scanner);
                 break;
+                
+            case 4:
+                editarCapacidadAlmacenamiento(scanner);
+                break;
 
             case 0:
                 System.out.println("\nVolviendo al menu principal...");
@@ -200,6 +213,33 @@ void menuAdministracion(Scanner scanner) {
         }
 
     } while (opcion != 0);
+}
+
+void editarCapacidadAlmacenamiento(Scanner scanner) {
+    System.out.println("\n--- Editar Capacidad de Almacenamiento ---");
+    System.out.println("Capacidad actual: " + String.format("%.2f", Administrador.getCapacidadAlmacen()) + " litros");
+    System.out.println("Espacio ocupado: " + String.format("%.2f", Administrador.getEspacioOcupado()) + " litros");
+    System.out.println("Espacio disponible: " + String.format("%.2f", Administrador.getEspacioDisponible()) + " litros");
+    
+    System.out.print("\nIngrese la nueva capacidad de almacenamiento (litros, 0 para cancelar): ");
+    double nuevaCapacidad = scanner.nextDouble();
+    scanner.nextLine();
+    
+    if (nuevaCapacidad == 0) {
+        System.out.println("Operacion cancelada.");
+        return;
+    }
+    
+    if (nuevaCapacidad < Administrador.getEspacioOcupado()) {
+        System.out.println("\nError: La nueva capacidad no puede ser menor al espacio actualmente ocupado.");
+        System.out.println("Espacio ocupado: " + String.format("%.2f", Administrador.getEspacioOcupado()) + " litros");
+        return;
+    }
+    
+    Administrador.setCapacidadAlmacen(nuevaCapacidad);
+    System.out.println("\nCapacidad de almacenamiento actualizada exitosamente.");
+    System.out.println("Nueva capacidad: " + String.format("%.2f", nuevaCapacidad) + " litros");
+    System.out.println("Espacio disponible: " + String.format("%.2f", Administrador.getEspacioDisponible()) + " litros");
 }
 
 // Métodos de Gestión de Productos
@@ -253,6 +293,10 @@ void agregarProducto(Scanner scanner) {
     System.out.print("Fecha de caducidad (YYYY-MM-DD): ");
     String fechaStr = scanner.nextLine();
     LocalDate fechaCaducidad = LocalDate.parse(fechaStr);
+    
+    System.out.print("Espacio de almacenamiento por unidad (litros): ");
+    double espacioAlmacenamiento = scanner.nextDouble();
+    scanner.nextLine();
 
     // Gestión de proveedor
     Proveedor proveedorSeleccionado = seleccionarOCrearProveedor(scanner);
@@ -263,8 +307,11 @@ void agregarProducto(Scanner scanner) {
     }
 
     // Crear y agregar el producto
-    Producto nuevoProducto = new Producto(nombre, precio, stock, codigo, tipo, caducidad, fechaCaducidad, costo, proveedorSeleccionado);
+    Producto nuevoProducto = new Producto(nombre, precio, stock, codigo, tipo, caducidad, fechaCaducidad, costo, proveedorSeleccionado, espacioAlmacenamiento);
     Producto.addProductos(nuevoProducto);
+    
+    // Actualizar espacio ocupado
+    Administrador.actualizarEspacioOcupado();
 }
 
 void eliminarProducto(Scanner scanner) {
@@ -278,6 +325,7 @@ void eliminarProducto(Scanner scanner) {
     }
 
     Producto.deleteProducto(codigo);
+    Administrador.actualizarEspacioOcupado();
 }
 
 void editarProducto(Scanner scanner) {
@@ -331,6 +379,10 @@ void editarProducto(Scanner scanner) {
     System.out.print("Nueva fecha de caducidad (YYYY-MM-DD): ");
     String fechaStr = scanner.nextLine();
     LocalDate fechaCaducidad = LocalDate.parse(fechaStr);
+    
+    System.out.print("Nuevo espacio de almacenamiento por unidad (litros): ");
+    double espacioAlmacenamiento = scanner.nextDouble();
+    scanner.nextLine();
 
     // Gestión de proveedor
     Proveedor proveedorSeleccionado = seleccionarOCrearProveedor(scanner);
@@ -341,8 +393,11 @@ void editarProducto(Scanner scanner) {
     }
 
     // Crear el producto con los nuevos datos y editar
-    Producto productoEditado = new Producto(nombre, precio, stock, codigo, tipo, caducidad, fechaCaducidad, costo, proveedorSeleccionado);
+    Producto productoEditado = new Producto(nombre, precio, stock, codigo, tipo, caducidad, fechaCaducidad, costo, proveedorSeleccionado, espacioAlmacenamiento);
     Producto.editarProducto(codigo, productoEditado);
+    
+    // Actualizar espacio ocupado
+    Administrador.actualizarEspacioOcupado();
 }
 
 void verTodosLosProductos() {
@@ -362,6 +417,8 @@ void verTodosLosProductos() {
         System.out.println("Caducidad: " + p.getCaducidadProducto());
         System.out.println("Fecha de caducidad: " + p.getFechaCaducidad());
         System.out.println("Costo: $" + p.getCostoProducto());
+        System.out.println("Espacio por unidad: " + String.format("%.2f", p.getEspacioAlmacenamiento()) + " litros");
+        System.out.println("Espacio total ocupado: " + String.format("%.2f", p.getEspacioAlmacenamiento() * p.getStockProducto()) + " litros");
         if (p.getProveedor() != null) {
             System.out.println("Proveedor: " + p.getProveedor().getNombreProveedor());
         } else {
@@ -474,6 +531,7 @@ void compraAProveedor(Scanner scanner) {
     System.out.println("      COMPRA A PROVEEDOR");
     System.out.println("========================================");
     System.out.println("Presupuesto disponible: $" + String.format("%.2f", Administrador.getPresupuesto()));
+    System.out.println("Espacio disponible: " + String.format("%.2f", Administrador.getEspacioDisponible()) + " litros");
 
     // Mostrar proveedores
     System.out.println("\nProveedores disponibles:");
@@ -514,7 +572,10 @@ void realizarCompra(Scanner scanner, Proveedor proveedor) {
     System.out.println("\n--- Productos de " + proveedor.getNombreProveedor() + " ---");
     int numero = 1;
     for (Producto p : productosProveedor) {
-        System.out.println(numero + ". " + p.getNombreProducto() + " - Costo: $" + p.getCostoProducto() + " - Stock actual: " + p.getStockProducto());
+        System.out.println(numero + ". " + p.getNombreProducto() + 
+            " - Costo: $" + p.getCostoProducto() + 
+            " - Stock actual: " + p.getStockProducto() +
+            " - Espacio/unidad: " + String.format("%.2f", p.getEspacioAlmacenamiento()) + " L");
         numero++;
     }
     System.out.println("0. Cancelar");
@@ -540,6 +601,7 @@ void realizarCompra(Scanner scanner, Proveedor proveedor) {
         }
 
         double costoTotal = productoSeleccionado.getCostoProducto() * cantidad;
+        double espacioNecesario = productoSeleccionado.getEspacioAlmacenamiento() * cantidad;
 
         if (costoTotal > Administrador.getPresupuesto()) {
             System.out.println("\nPresupuesto insuficiente.");
@@ -547,11 +609,19 @@ void realizarCompra(Scanner scanner, Proveedor proveedor) {
             System.out.println("Presupuesto disponible: $" + String.format("%.2f", Administrador.getPresupuesto()));
             return;
         }
+        
+        if (espacioNecesario > Administrador.getEspacioDisponible()) {
+            System.out.println("\nEspacio de almacenamiento insuficiente.");
+            System.out.println("Espacio necesario: " + String.format("%.2f", espacioNecesario) + " litros");
+            System.out.println("Espacio disponible: " + String.format("%.2f", Administrador.getEspacioDisponible()) + " litros");
+            return;
+        }
 
         // Realizar compra
         int nuevoStock = productoSeleccionado.getStockProducto() + cantidad;
         productoSeleccionado.setStockProducto(nuevoStock);
         Administrador.setPresupuesto(Administrador.getPresupuesto() - costoTotal);
+        Administrador.actualizarEspacioOcupado();
 
         System.out.println("\n=== COMPRA REALIZADA ===");
         System.out.println("Producto: " + productoSeleccionado.getNombreProducto());
@@ -559,6 +629,8 @@ void realizarCompra(Scanner scanner, Proveedor proveedor) {
         System.out.println("Costo total: $" + String.format("%.2f", costoTotal));
         System.out.println("Stock anterior: " + (nuevoStock - cantidad));
         System.out.println("Stock actual: " + nuevoStock);
+        System.out.println("Espacio utilizado: " + String.format("%.2f", espacioNecesario) + " litros");
+        System.out.println("Espacio disponible: " + String.format("%.2f", Administrador.getEspacioDisponible()) + " litros");
         System.out.println("Presupuesto restante: $" + String.format("%.2f", Administrador.getPresupuesto()));
         System.out.println("========================");
     } else {

@@ -10,6 +10,10 @@ import java.util.Scanner;
 public class Administrador {
     // Atributo para almacenar el presupuesto
     private static double presupuesto = 0.0;
+    
+    // Atributos para gestión de almacenamiento
+    private static double capacidadAlmacen = 0.0;
+    private static double espacioOcupado = 0.0;
 
     // Getters y Setters
     public static double getPresupuesto() {
@@ -18,6 +22,36 @@ public class Administrador {
 
     public static void setPresupuesto(double presupuesto) {
         Administrador.presupuesto = presupuesto;
+    }
+    
+    public static double getCapacidadAlmacen() {
+        return capacidadAlmacen;
+    }
+    
+    public static void setCapacidadAlmacen(double capacidadAlmacen) {
+        Administrador.capacidadAlmacen = capacidadAlmacen;
+    }
+    
+    public static double getEspacioOcupado() {
+        return espacioOcupado;
+    }
+    
+    public static void setEspacioOcupado(double espacioOcupado) {
+        Administrador.espacioOcupado = espacioOcupado;
+    }
+    
+    public static double getEspacioDisponible() {
+        return capacidadAlmacen - espacioOcupado;
+    }
+    
+    /**
+     * Actualiza el espacio ocupado calculando el total del inventario
+     */
+    public static void actualizarEspacioOcupado() {
+        espacioOcupado = 0.0;
+        for (Producto p : Producto.getListaProductos()) {
+            espacioOcupado += p.getEspacioAlmacenamiento() * p.getStockProducto();
+        }
     }
 
     /**
@@ -205,11 +239,16 @@ public class Administrador {
             ganancia += (precioVenta - costoTotal);
         }
         presupuesto += totalVenta;
+        
+        // Actualizar espacio ocupado tras la venta
+        actualizarEspacioOcupado();
 
         System.out.println("\nVenta realizada exitosamente!");
         System.out.println("  Total de la venta: $" + String.format("%.2f", totalVenta));
         System.out.println("  Ganancia neta: $" + String.format("%.2f", ganancia));
         System.out.println("  Presupuesto actual: $" + String.format("%.2f", presupuesto));
+        System.out.println("  Espacio liberado en almacen");
+        System.out.println("  Espacio disponible: " + String.format("%.2f", getEspacioDisponible()) + " litros");
 
         // Imprimir factura automáticamente
         imprimirFactura(factura);
