@@ -54,7 +54,7 @@ public class Administrador {
     }
 
     /**
-     * Método para procesar toda la venta (interfaz + lógica)
+     * Procesa la venta de productos
      */
     public static void procesarVenta(Scanner scanner) {
         System.out.println("\n========================================");
@@ -196,6 +196,7 @@ public class Administrador {
         Factura factura = new Factura(items);
 
         // Calcular ganancia y actualizar presupuesto
+        double totalVenta = factura.getTotal();
         double ganancia = 0;
         for (ItemVenta item : items) {
             Producto p = item.getProducto();
@@ -203,10 +204,11 @@ public class Administrador {
             double costoTotal = p.getCostoProducto() * item.getCantidad();
             ganancia += (precioVenta - costoTotal);
         }
-        presupuesto += ganancia;
+        presupuesto += totalVenta;
 
         System.out.println("\nVenta realizada exitosamente!");
-        System.out.println("  Ganancia de la venta: $" + String.format("%.2f", ganancia));
+        System.out.println("  Total de la venta: $" + String.format("%.2f", totalVenta));
+        System.out.println("  Ganancia neta: $" + String.format("%.2f", ganancia));
         System.out.println("  Presupuesto actual: $" + String.format("%.2f", presupuesto));
 
         // Imprimir factura automáticamente
@@ -229,7 +231,6 @@ public class Administrador {
         System.out.println("  PRODUCTOS");
         System.out.println("-------------------------------------------------------------------------");
 
-        /**Dimensiones para que se coloque la tabla correctamente*/
         System.out.printf("  %-10s %-25s %-8s %-10s %-12s%n",
                 "Código", "Nombre", "Cant.", "P. Unit.", "Subtotal");
         System.out.println("--------------------------------------------------------------------------");

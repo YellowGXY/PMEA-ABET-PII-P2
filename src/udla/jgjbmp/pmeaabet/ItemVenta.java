@@ -1,8 +1,9 @@
 package udla.jgjbmp.pmeaabet;
 
-/**La clase es necesario ya que para crear la factura es necesario tener una clase que registre todos los productos
- * vendidos y su informacion correspondiente*/
-
+/**
+ * La clase es necesario ya que para crear la factura es necesario tener una clase que registre todos los productos
+ * vendidos y su informacion correspondiente
+ */
 public class ItemVenta {
     private Producto producto;
     private int cantidad;
@@ -30,7 +31,7 @@ public class ItemVenta {
     }
 
     /**
-     * Calcula el subtotal del item (precio × cantidad)
+     * Calcula el subtotal del item (precio por cantidad)
      */
     public double getSubtotal() {
         return producto.getPrecioProducto() * cantidad;

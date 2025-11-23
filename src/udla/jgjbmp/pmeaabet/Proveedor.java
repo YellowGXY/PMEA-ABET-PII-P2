@@ -66,7 +66,6 @@ public class Proveedor {
     
     /**
      * Metodo para agregar un nuevo proveedor
-     * El proveedor a agregar
      */
     public static void addProveedor(Proveedor proveedor) {
         if (proveedor == null) {
@@ -88,7 +87,6 @@ public class Proveedor {
     
     /**
      * Buscar proveedor por código
-     * El código del proveedor
      */
     public static Proveedor buscarPorCodigo(String codigoProveedor) {
         for (Proveedor p : listaProveedores) {
@@ -97,5 +95,50 @@ public class Proveedor {
             }
         }
         return null;
+    }
+    
+    /**
+     * Editar un proveedor existente
+     */
+    public static void editarProveedor(String codigoProveedor, Proveedor nuevoProveedor) {
+        for (int i = 0; i < listaProveedores.size(); i++) {
+            if (listaProveedores.get(i).getCodigoProveedor().equals(codigoProveedor)) {
+                nuevoProveedor.setCodigoProveedor(codigoProveedor);
+                listaProveedores.set(i, nuevoProveedor);
+                System.out.println("Proveedor actualizado: " + nuevoProveedor.getNombreProveedor());
+                return;
+            }
+        }
+        System.out.println("Error: No se encontro un proveedor con el codigo " + codigoProveedor);
+    }
+    
+    /**
+     * Eliminar un proveedor por su codigo
+     */
+    public static void deleteProveedor(String codigoProveedor) {
+        for (int i = 0; i < listaProveedores.size(); i++) {
+            if (listaProveedores.get(i).getCodigoProveedor().equals(codigoProveedor)) {
+                Proveedor proveedorEliminado = listaProveedores.remove(i);
+                System.out.println("Proveedor eliminado: " + proveedorEliminado.getNombreProveedor());
+                return;
+            }
+        }
+        System.out.println("Error: No se encontro un proveedor con el codigo " + codigoProveedor);
+    }
+    
+    /**
+     * Obtener todos los productos que pertenecen a este proveedor
+     */
+    public static List<Producto> obtenerProductosDeProveedor(Proveedor proveedor) {
+        List<Producto> productosDelProveedor = new ArrayList<>();
+        
+        for (Producto p : Producto.getListaProductos()) {
+            if (p.getProveedor() != null && 
+                p.getProveedor().getCodigoProveedor().equals(proveedor.getCodigoProveedor())) {
+                productosDelProveedor.add(p);
+            }
+        }
+        
+        return productosDelProveedor;
     }
 }

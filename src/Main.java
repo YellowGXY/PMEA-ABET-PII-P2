@@ -3,9 +3,20 @@ import udla.jgjbmp.pmeaabet.enums.Tipo;
 import udla.jgjbmp.pmeaabet.enums.Caducidad;
 import java.time.LocalDate;
 import java.util.Scanner;
+import java.util.List;
 
 void main() {
     Scanner scanner = new Scanner(System.in);
+    
+    System.out.println("========================================");
+    System.out.println("   SISTEMA DE GESTION DE INVENTARIOS");
+    System.out.println("========================================");
+    System.out.print("Ingrese el presupuesto inicial: $");
+    double presupuestoInicial = scanner.nextDouble();
+    scanner.nextLine();
+    Administrador.setPresupuesto(presupuestoInicial);
+    System.out.println("Presupuesto registrado: $" + String.format("%.2f", presupuestoInicial));
+    
     int opcionPrincipal;
 
     do {
@@ -59,6 +70,7 @@ void menuGestionProductos(Scanner scanner) {
         System.out.println("2. Eliminar Producto");
         System.out.println("3. Editar Producto");
         System.out.println("4. Ver Todos los Productos");
+        System.out.println("5. Gestion de Proveedores");
         System.out.println("0. Volver al Menú Principal");
         System.out.println("========================================");
         System.out.print("Seleccione una opción: ");
@@ -82,6 +94,10 @@ void menuGestionProductos(Scanner scanner) {
                 verTodosLosProductos();
                 break;
 
+            case 5:
+                menuGestionProveedores(scanner);
+                break;
+
             case 0:
                 System.out.println("\nVolviendo al menú principal...");
                 break;
@@ -93,24 +109,22 @@ void menuGestionProductos(Scanner scanner) {
     } while (opcion != 0);
 }
 
-// Menú de Gestión de Inventario - ACTUALIZADO CON TUS MÉTODOS
+// Menú de Gestión de Inventario
 void menuGestionInventario(Scanner scanner) {
     int opcion;
 
     do {
         System.out.println("\n========================================");
-        System.out.println("      GESTIÓN DE INVENTARIO");
+        System.out.println("      GESTION DE INVENTARIO");
         System.out.println("========================================");
         System.out.println("1. Ver Inventario Completo");
-        System.out.println("2. Buscar Producto por Código");
+        System.out.println("2. Buscar Producto por Codigo");
         System.out.println("3. Buscar Producto por Nombre");
-        System.out.println("4. Reabastecimiento de Producto");
-        System.out.println("5. Registrar Venta");
-        System.out.println("6. Generar Reporte de Inventario");
-        System.out.println("7. Ver Inventario Detallado"); // Nuevo
-        System.out.println("0. Volver al Menú Principal");
+        System.out.println("4. Generar Reporte de Inventario");
+        System.out.println("5. Ver Inventario Detallado");
+        System.out.println("0. Volver al Menu Principal");
         System.out.println("========================================");
-        System.out.print("Seleccione una opción: ");
+        System.out.print("Seleccione una opcion: ");
         opcion = scanner.nextInt();
         scanner.nextLine();
 
@@ -128,27 +142,19 @@ void menuGestionInventario(Scanner scanner) {
                 break;
 
             case 4:
-                reabastecerProducto(scanner);
-                break;
-
-            case 5:
-                registrarVenta(scanner);
-                break;
-
-            case 6:
                 Inventario.reporteInv();
                 break;
 
-            case 7:
+            case 5:
                 Inventario.verInventario();
                 break;
 
             case 0:
-                System.out.println("\nVolviendo al menú principal...");
+                System.out.println("\nVolviendo al menu principal...");
                 break;
 
             default:
-                System.out.println("\nOpción inválida. Por favor intente nuevamente.");
+                System.out.println("\nOpcion invalida. Por favor intente nuevamente.");
         }
 
     } while (opcion != 0);
@@ -160,13 +166,15 @@ void menuAdministracion(Scanner scanner) {
 
     do {
         System.out.println("\n========================================");
-        System.out.println("         ADMINISTRACIÓN");
+        System.out.println("         ADMINISTRACION");
         System.out.println("========================================");
         System.out.println("  Presupuesto actual: $" + String.format("%.2f", Administrador.getPresupuesto()));
         System.out.println("1. Vender Productos");
-        System.out.println("0. Volver al Menú Principal");
+        System.out.println("2. Compra a Proveedor");
+        System.out.println("3. Gestion de Proveedores");
+        System.out.println("0. Volver al Menu Principal");
         System.out.println("========================================");
-        System.out.print("Seleccione una opción: ");
+        System.out.print("Seleccione una opcion: ");
         opcion = scanner.nextInt();
         scanner.nextLine();
 
@@ -175,12 +183,20 @@ void menuAdministracion(Scanner scanner) {
                 Administrador.procesarVenta(scanner);
                 break;
 
+            case 2:
+                compraAProveedor(scanner);
+                break;
+
+            case 3:
+                menuGestionProveedores(scanner);
+                break;
+
             case 0:
-                System.out.println("\nVolviendo al menú principal...");
+                System.out.println("\nVolviendo al menu principal...");
                 break;
 
             default:
-                System.out.println("\nOpción inválida. Por favor intente nuevamente.");
+                System.out.println("\nOpcion invalida. Por favor intente nuevamente.");
         }
 
     } while (opcion != 0);
@@ -190,63 +206,28 @@ void menuAdministracion(Scanner scanner) {
 void agregarProducto(Scanner scanner) {
     System.out.println("\n--- Agregar Nuevo Producto ---");
 
-    System.out.print("Código del producto: ");
+    System.out.print("Codigo del producto (0 para cancelar): ");
     String codigo = scanner.nextLine();
+    
+    if (codigo.equals("0")) {
+        System.out.println("Operacion cancelada.");
+        return;
+    }
 
     System.out.print("Nombre del producto: ");
     String nombre = scanner.nextLine();
 
-    double precio = 0;
-    boolean precioValido = false;
-    while (!precioValido) {
-        try {
-            System.out.print("Precio del producto (use punto como separador decimal, ej: 10.50): ");
-            precio = scanner.nextDouble();
-            if (precio <= 0) {
-                System.out.println("Error: El precio debe ser mayor a 0");
-            } else {
-                precioValido = true;
-            }
-        } catch (Exception e) {
-            System.out.println("Error: Ingrese un número válido (use punto como separador decimal)");
-            scanner.nextLine(); // Limpiar buffer
-        }
-    }
+    System.out.print("Precio del producto (use punto como separador decimal, ej: 10.50): ");
+    double precio = scanner.nextDouble();
+    scanner.nextLine();
 
-    int stock = 0;
-    boolean stockValido = false;
-    while (!stockValido) {
-        try {
-            System.out.print("Stock inicial: ");
-            stock = scanner.nextInt();
-            if (stock < 0) {
-                System.out.println("Error: El stock no puede ser negativo");
-            } else {
-                stockValido = true;
-            }
-        } catch (Exception e) {
-            System.out.println("Error: Ingrese un número entero válido");
-            scanner.nextLine(); // Limpiar buffer
-        }
-    }
+    System.out.print("Stock inicial: ");
+    int stock = scanner.nextInt();
+    scanner.nextLine();
 
-    double costo = 0;
-    boolean costoValido = false;
-    while (!costoValido) {
-        try {
-            System.out.print("Costo del producto (use punto como separador decimal, ej: 8.50): ");
-            costo = scanner.nextDouble();
-            if (costo <= 0) {
-                System.out.println("Error: El costo debe ser mayor a 0");
-            } else {
-                costoValido = true;
-            }
-        } catch (Exception e) {
-            System.out.println("Error: Ingrese un número válido (use punto como separador decimal)");
-            scanner.nextLine(); // Limpiar buffer
-        }
-    }
-    scanner.nextLine(); // Limpiar buffer final
+    System.out.print("Costo del producto (use punto como separador decimal, ej: 8.50): ");
+    double costo = scanner.nextDouble();
+    scanner.nextLine(); 
 
     // Mostrar tipos disponibles
     System.out.println("\nTipos de producto disponibles:");
@@ -288,73 +269,43 @@ void agregarProducto(Scanner scanner) {
 
 void eliminarProducto(Scanner scanner) {
     System.out.println("\n--- Eliminar Producto ---");
-    System.out.print("Ingrese el código del producto a eliminar: ");
+    System.out.print("Ingrese el codigo del producto a eliminar (0 para cancelar): ");
     String codigo = scanner.nextLine();
+    
+    if (codigo.equals("0")) {
+        System.out.println("Operacion cancelada.");
+        return;
+    }
 
     Producto.deleteProducto(codigo);
 }
 
 void editarProducto(Scanner scanner) {
     System.out.println("\n--- Editar Producto ---");
-    System.out.print("Ingrese el código del producto a editar: ");
+    System.out.print("Ingrese el codigo del producto a editar (0 para cancelar): ");
     String codigo = scanner.nextLine();
+    
+    if (codigo.equals("0")) {
+        System.out.println("Operacion cancelada.");
+        return;
+    }
 
     System.out.println("\nIngrese los nuevos datos del producto:");
 
     System.out.print("Nuevo nombre del producto: ");
     String nombre = scanner.nextLine();
 
-    double precio = 0;
-    boolean precioValido = false;
-    while (!precioValido) {
-        try {
-            System.out.print("Nuevo precio del producto (use punto como separador, ej: 10.50): ");
-            precio = scanner.nextDouble();
-            if (precio <= 0) {
-                System.out.println("Error: El precio debe ser mayor a 0");
-            } else {
-                precioValido = true;
-            }
-        } catch (Exception e) {
-            System.out.println("Error: Ingrese un número válido (use punto como separador decimal)");
-            scanner.nextLine();
-        }
-    }
+    System.out.print("Nuevo precio del producto (use punto como separador, ej: 10.50): ");
+    double precio = scanner.nextDouble();
+    scanner.nextLine();
 
-    int stock = 0;
-    boolean stockValido = false;
-    while (!stockValido) {
-        try {
-            System.out.print("Nuevo stock: ");
-            stock = scanner.nextInt();
-            if (stock < 0) {
-                System.out.println("Error: El stock no puede ser negativo");
-            } else {
-                stockValido = true;
-            }
-        } catch (Exception e) {
-            System.out.println("Error: Ingrese un número entero válido");
-            scanner.nextLine();
-        }
-    }
+    System.out.print("Nuevo stock: ");
+    int stock = scanner.nextInt();
+    scanner.nextLine();
 
-    double costo = 0;
-    boolean costoValido = false;
-    while (!costoValido) {
-        try {
-            System.out.print("Nuevo costo del producto (use punto como separador, ej: 8.50): ");
-            costo = scanner.nextDouble();
-            if (costo <= 0) {
-                System.out.println("Error: El costo debe ser mayor a 0");
-            } else {
-                costoValido = true;
-            }
-        } catch (Exception e) {
-            System.out.println("Error: Ingrese un número válido (use punto como separador decimal)");
-            scanner.nextLine();
-        }
-    }
-    scanner.nextLine(); // Limpiar buffer
+    System.out.print("Nuevo costo del producto (use punto como separador, ej: 8.50): ");
+    double costo = scanner.nextDouble();
+    scanner.nextLine();
 
     // Mostrar tipos disponibles
     System.out.println("\nTipos de producto disponibles:");
@@ -487,8 +438,9 @@ Proveedor crearNuevoProveedor(Scanner scanner) {
 }
 
 // Métodos de Gestión de Inventario
+
 /**
- * Método para buscar un producto por código
+ * Metodo para buscar un producto por código
  */
 void buscarProductoPorCodigo(Scanner scanner) {
     System.out.println("\n--- Buscar Producto por Código ---");
@@ -499,7 +451,7 @@ void buscarProductoPorCodigo(Scanner scanner) {
 }
 
 /**
- * Método para buscar un producto por nombre
+ * Metodo para buscar un producto por nombre
  */
 void buscarProductoPorNombre(Scanner scanner) {
     System.out.println("\n--- Buscar Producto por Nombre ---");
@@ -510,51 +462,277 @@ void buscarProductoPorNombre(Scanner scanner) {
 }
 
 /**
- * Método para reabastecer un producto
- * NUEVO - Integra tu método invReabastecimiento()
+ * Metodo para comprar productos a un proveedor
  */
-void reabastecerProducto(Scanner scanner) {
-    System.out.println("\n--- Reabastecimiento de Producto ---");
+void compraAProveedor(Scanner scanner) {
+    if (Proveedor.getListaProveedores().isEmpty()) {
+        System.out.println("\nNo hay proveedores registrados.");
+        return;
+    }
 
-    // Primero mostrar el inventario resumido
-    Inventario.verInventarioCompleto();
+    System.out.println("\n========================================");
+    System.out.println("      COMPRA A PROVEEDOR");
+    System.out.println("========================================");
+    System.out.println("Presupuesto disponible: $" + String.format("%.2f", Administrador.getPresupuesto()));
 
-    System.out.print("\nIngrese el código del producto a reabastecer: ");
-    String codigo = scanner.nextLine();
+    // Mostrar proveedores
+    System.out.println("\nProveedores disponibles:");
+    int numero = 1;
+    for (Proveedor p : Proveedor.getListaProveedores()) {
+        System.out.println(numero + ". " + p.getNombreProveedor() + " (" + p.getCodigoProveedor() + ")");
+        numero++;
+    }
+    System.out.println("0. Cancelar");
 
-    System.out.print("Ingrese la cantidad a agregar al stock: ");
-    int cantidad = scanner.nextInt();
+    System.out.print("\nSeleccione un proveedor: ");
+    int opcion = scanner.nextInt();
     scanner.nextLine();
 
-    // Llamar al método de tu clase Inventario
-    Inventario.invReabastecimiento(codigo, cantidad);
+    if (opcion == 0) {
+        return;
+    }
+
+    if (opcion > 0 && opcion < numero) {
+        Proveedor proveedorSeleccionado = Proveedor.getListaProveedores().get(opcion - 1);
+        realizarCompra(scanner, proveedorSeleccionado);
+    } else {
+        System.out.println("Opcion invalida.");
+    }
 }
 
 /**
- * Método para registrar una venta
- * NUEVO - Integra tu método invVenta()
+ * Metodo para realizar la compra de productos a un proveedor
  */
-void registrarVenta(Scanner scanner) {
-    System.out.println("\n--- Registrar Venta ---");
+void realizarCompra(Scanner scanner, Proveedor proveedor) {
+    List<Producto> productosProveedor = Proveedor.obtenerProductosDeProveedor(proveedor);
 
-    // Primero mostrar el inventario resumido
-    Inventario.verInventarioCompleto();
+    if (productosProveedor.isEmpty()) {
+        System.out.println("\nEste proveedor no tiene productos registrados.");
+        return;
+    }
 
-    System.out.print("\nIngrese el código del producto a vender: ");
-    String codigo = scanner.nextLine();
+    System.out.println("\n--- Productos de " + proveedor.getNombreProveedor() + " ---");
+    int numero = 1;
+    for (Producto p : productosProveedor) {
+        System.out.println(numero + ". " + p.getNombreProducto() + " - Costo: $" + p.getCostoProducto() + " - Stock actual: " + p.getStockProducto());
+        numero++;
+    }
+    System.out.println("0. Cancelar");
 
-    // Mostrar información del producto antes de vender
-    Producto producto = Inventario.buscarProducto(codigo);
-    if (producto != null) {
-        Inventario.mostrarInfoProducto(producto);
+    System.out.print("\nSeleccione un producto para comprar: ");
+    int opcion = scanner.nextInt();
+    scanner.nextLine();
 
-        System.out.print("\nIngrese la cantidad a vender: ");
+    if (opcion == 0) {
+        return;
+    }
+
+    if (opcion > 0 && opcion < numero) {
+        Producto productoSeleccionado = productosProveedor.get(opcion - 1);
+        
+        System.out.print("Ingrese la cantidad a comprar: ");
         int cantidad = scanner.nextInt();
         scanner.nextLine();
 
-        // Llamar al método de tu clase Inventario
-        Inventario.invVenta(codigo, cantidad);
+        if (cantidad <= 0) {
+            System.out.println("La cantidad debe ser mayor a 0.");
+            return;
+        }
+
+        double costoTotal = productoSeleccionado.getCostoProducto() * cantidad;
+
+        if (costoTotal > Administrador.getPresupuesto()) {
+            System.out.println("\nPresupuesto insuficiente.");
+            System.out.println("Costo total: $" + String.format("%.2f", costoTotal));
+            System.out.println("Presupuesto disponible: $" + String.format("%.2f", Administrador.getPresupuesto()));
+            return;
+        }
+
+        // Realizar compra
+        int nuevoStock = productoSeleccionado.getStockProducto() + cantidad;
+        productoSeleccionado.setStockProducto(nuevoStock);
+        Administrador.setPresupuesto(Administrador.getPresupuesto() - costoTotal);
+
+        System.out.println("\n=== COMPRA REALIZADA ===");
+        System.out.println("Producto: " + productoSeleccionado.getNombreProducto());
+        System.out.println("Cantidad comprada: " + cantidad);
+        System.out.println("Costo total: $" + String.format("%.2f", costoTotal));
+        System.out.println("Stock anterior: " + (nuevoStock - cantidad));
+        System.out.println("Stock actual: " + nuevoStock);
+        System.out.println("Presupuesto restante: $" + String.format("%.2f", Administrador.getPresupuesto()));
+        System.out.println("========================");
     } else {
-        System.out.println("Producto no encontrado.");
+        System.out.println("Opcion invalida.");
     }
+}
+
+// Menu de Gestion de Proveedores
+void menuGestionProveedores(Scanner scanner) {
+    int opcion;
+
+    do {
+        System.out.println("\n========================================");
+        System.out.println("      GESTION DE PROVEEDORES");
+        System.out.println("========================================");
+        System.out.println("1. Agregar Proveedor");
+        System.out.println("2. Editar Proveedor");
+        System.out.println("3. Eliminar Proveedor");
+        System.out.println("4. Ver Todos los Proveedores");
+        System.out.println("0. Volver al Menu Anterior");
+        System.out.println("========================================");
+        System.out.print("Seleccione una opcion: ");
+        opcion = scanner.nextInt();
+        scanner.nextLine();
+
+        switch (opcion) {
+            case 1:
+                agregarNuevoProveedor(scanner);
+                break;
+
+            case 2:
+                editarProveedorExistente(scanner);
+                break;
+
+            case 3:
+                eliminarProveedorExistente(scanner);
+                break;
+
+            case 4:
+                verTodosLosProveedores();
+                break;
+
+            case 0:
+                System.out.println("\nVolviendo al menu anterior...");
+                break;
+
+            default:
+                System.out.println("\nOpcion invalida. Por favor intente nuevamente.");
+        }
+
+    } while (opcion != 0);
+}
+
+void agregarNuevoProveedor(Scanner scanner) {
+    System.out.println("\n--- Agregar Nuevo Proveedor ---");
+
+    System.out.print("Codigo del proveedor (0 para cancelar): ");
+    String codigo = scanner.nextLine();
+    
+    if (codigo.equals("0")) {
+        System.out.println("Operacion cancelada.");
+        return;
+    }
+
+    System.out.print("Nombre del proveedor: ");
+    String nombre = scanner.nextLine();
+
+    System.out.print("Telefono del proveedor: ");
+    String telefono = scanner.nextLine();
+
+    System.out.print("Direccion del proveedor: ");
+    String direccion = scanner.nextLine();
+
+    Proveedor nuevoProveedor = new Proveedor(codigo, nombre, telefono, direccion);
+    Proveedor.addProveedor(nuevoProveedor);
+}
+
+void editarProveedorExistente(Scanner scanner) {
+    System.out.println("\n--- Editar Proveedor ---");
+    
+    if (Proveedor.getListaProveedores().isEmpty()) {
+        System.out.println("No hay proveedores registrados.");
+        return;
+    }
+
+    System.out.print("Ingrese el codigo del proveedor a editar (0 para cancelar): ");
+    String codigo = scanner.nextLine();
+    
+    if (codigo.equals("0")) {
+        System.out.println("Operacion cancelada.");
+        return;
+    }
+
+    Proveedor proveedorExistente = Proveedor.buscarPorCodigo(codigo);
+    if (proveedorExistente == null) {
+        System.out.println("No se encontro un proveedor con ese codigo.");
+        return;
+    }
+
+    System.out.println("\nProveedor actual:");
+    System.out.println("Nombre: " + proveedorExistente.getNombreProveedor());
+    System.out.println("Telefono: " + proveedorExistente.getTelefonoProveedor());
+    System.out.println("Direccion: " + proveedorExistente.getDireccionProveedor());
+
+    System.out.println("\nIngrese los nuevos datos del proveedor:");
+
+    System.out.print("Nuevo nombre del proveedor: ");
+    String nombre = scanner.nextLine();
+
+    System.out.print("Nuevo telefono del proveedor: ");
+    String telefono = scanner.nextLine();
+
+    System.out.print("Nueva direccion del proveedor: ");
+    String direccion = scanner.nextLine();
+
+    Proveedor proveedorEditado = new Proveedor(codigo, nombre, telefono, direccion);
+    Proveedor.editarProveedor(codigo, proveedorEditado);
+}
+
+void eliminarProveedorExistente(Scanner scanner) {
+    System.out.println("\n--- Eliminar Proveedor ---");
+    
+    if (Proveedor.getListaProveedores().isEmpty()) {
+        System.out.println("No hay proveedores registrados.");
+        return;
+    }
+
+    System.out.print("Ingrese el codigo del proveedor a eliminar (0 para cancelar): ");
+    String codigo = scanner.nextLine();
+    
+    if (codigo.equals("0")) {
+        System.out.println("Operacion cancelada.");
+        return;
+    }
+
+    Proveedor proveedorExistente = Proveedor.buscarPorCodigo(codigo);
+    if (proveedorExistente == null) {
+        System.out.println("No se encontro un proveedor con ese codigo.");
+        return;
+    }
+
+    List<Producto> productosProveedor = Proveedor.obtenerProductosDeProveedor(proveedorExistente);
+    if (!productosProveedor.isEmpty()) {
+        System.out.println("\nAdvertencia: Este proveedor tiene " + productosProveedor.size() + " producto(s) asociado(s).");
+        System.out.print("Esta seguro que desea eliminar el proveedor? (S/N): ");
+        String confirmacion = scanner.nextLine().trim().toUpperCase();
+        
+        if (!confirmacion.equals("S")) {
+            System.out.println("Operacion cancelada.");
+            return;
+        }
+    }
+
+    Proveedor.deleteProveedor(codigo);
+}
+
+void verTodosLosProveedores() {
+    System.out.println("\n--- LISTA DE PROVEEDORES ---");
+
+    if (Proveedor.getListaProveedores().isEmpty()) {
+        System.out.println("No hay proveedores registrados.");
+        return;
+    }
+
+    for (Proveedor p : Proveedor.getListaProveedores()) {
+        System.out.println("\nCodigo: " + p.getCodigoProveedor());
+        System.out.println("Nombre: " + p.getNombreProveedor());
+        System.out.println("Telefono: " + p.getTelefonoProveedor());
+        System.out.println("Direccion: " + p.getDireccionProveedor());
+        
+        List<Producto> productosProveedor = Proveedor.obtenerProductosDeProveedor(p);
+        System.out.println("Productos asociados: " + productosProveedor.size());
+        System.out.println("---");
+    }
+
+    System.out.println("\nTotal de proveedores: " + Proveedor.getListaProveedores().size());
 }

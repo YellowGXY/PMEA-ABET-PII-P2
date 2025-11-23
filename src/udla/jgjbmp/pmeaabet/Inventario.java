@@ -53,8 +53,6 @@ public class Inventario {
         Inventario.costosInv = costosInv;
     }
 
-    // ==================== MÉTODOS EXISTENTES (de tus compañeros) ====================
-
     /**
      * Método para buscar un producto por código
      */
@@ -68,9 +66,8 @@ public class Inventario {
     }
 
     /**
-     * Método para buscar un producto por nombre
-     * Busca coincidencias que se parezcan (no necesita ser exacto), ya que el usuario puede variar la forma
-     * de digitar, asi que se cambia minusculas siempre.
+     * Busca un producto por nombre sin distinguir mayusculas y minusculas
+     * Permite busquedas parciales del nombre del producto
      */
     public static Producto buscarProductoPorNombre(String nombreProducto) {
         // Convertir a minúsculas para búsqueda case-insensitive
@@ -139,7 +136,7 @@ public class Inventario {
     }
 
     /**
-     * Método para mostrar información resumida de un producto (para ventas)
+     * Muestra informacion resumida de un producto
      */
     public static void mostrarInfoProducto(Producto producto) {
         if (producto == null) {
@@ -156,7 +153,7 @@ public class Inventario {
     }
 
     /**
-     * Método para ver el inventario completo
+     * Muestra el inventario completo en formato tabla resumida
      */
     public static void verInventarioCompleto() {
         if (Producto.getListaProductos().isEmpty()) {
@@ -168,7 +165,6 @@ public class Inventario {
         System.out.println("                    INVENTARIO COMPLETO                         ");
         System.out.println("=================================================================");
 
-        /**Dimensiones para que se coloque la tabla correctamente*/
         System.out.printf("\n  %-10s %-25s %-10s %-10s %-10s%n",
                 "Código", "Nombre", "Precio", "Stock", "Costo");
         System.out.println("  ──────────────────────────────────────────────────────────────────");
@@ -191,8 +187,6 @@ public class Inventario {
         System.out.println("=======================================================================\n");
     }
 
-    // ==================== MÉTODOS NUEVOS (tu parte del proyecto) ====================
-
     /**
      * Actualiza las estadísticas generales del inventario
      */
@@ -214,42 +208,7 @@ public class Inventario {
     }
 
     /**
-     * Método para reabastecer productos en el inventario
-     * @param codigoProducto El código del producto a reabastecer
-     * @param cantidad La cantidad a agregar al stock
-     */
-    public static void invReabastecimiento(String codigoProducto, int cantidad) {
-        if (cantidad <= 0) {
-            System.out.println("Error: La cantidad debe ser mayor a 0");
-            return;
-        }
-
-        Producto producto = buscarProducto(codigoProducto);
-
-        if (producto == null) {
-            System.out.println("Error: No se encontró el producto con código " + codigoProducto);
-            return;
-        }
-
-        // Actualizar el stock del producto
-        int nuevoStock = producto.getStockProducto() + cantidad;
-        producto.setStockProducto(nuevoStock);
-
-        System.out.println("=== REABASTECIMIENTO EXITOSO ===");
-        System.out.println("Producto: " + producto.getNombreProducto());
-        System.out.println("Cantidad agregada: " + cantidad);
-        System.out.println("Stock anterior: " + (nuevoStock - cantidad));
-        System.out.println("Stock actual: " + nuevoStock);
-        System.out.println("================================");
-
-        // Actualizar estadísticas del inventario
-        actualizarEstadisticas();
-    }
-
-    /**
      * Método para registrar una venta y actualizar el inventario
-     * @param codigoProducto El código del producto a vender
-     * @param cantidad La cantidad a vender
      */
     public static void invVenta(String codigoProducto, int cantidad) {
         if (cantidad <= 0) {
@@ -297,7 +256,7 @@ public class Inventario {
 
         // Alerta si el stock es bajo
         if (nuevoStock < 2) {
-            System.out.println("⚠️ ALERTA: Stock bajo para " + producto.getNombreProducto() + " - ¡Reabastecer pronto!");
+            System.out.println("ALERTA: Stock bajo para " + producto.getNombreProducto() + " - ¡Reabastecer pronto!");
         }
     }
 
@@ -312,14 +271,14 @@ public class Inventario {
             return;
         }
 
-        // Actualizar estadísticas antes de generar el reporte
+        // Actualizar estadisticas antes de generar el reporte
         actualizarEstadisticas();
 
-        System.out.println("\n╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗");
-        System.out.println("║                                            REPORTE DE INVENTARIO                                                           ║");
-        System.out.println("╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣");
-        System.out.println("║ Código    │ Nombre Producto              │ Tipo             │ Precio   │ Stock │ Caducidad  │ Días Rest. │ Reabastecer ║");
-        System.out.println("╠═══════════╪══════════════════════════════╪══════════════════╪══════════╪═══════╪════════════╪════════════╪═════════════╣");
+        System.out.println("\n============================================================================================================================");
+        System.out.println("                                            REPORTE DE INVENTARIO                                                           ");
+        System.out.println("============================================================================================================================");
+        System.out.println(" Codigo    | Nombre Producto              | Tipo             | Precio   | Stock | Caducidad  | Dias Rest. | Reabastecer ");
+        System.out.println("-----------|------------------------------|------------------|----------|-------|------------|------------|-------------");
 
         for (Producto p : productos) {
             String codigo = ajustarAncho(p.getCodigoProducto(), 9);
@@ -337,22 +296,22 @@ public class Inventario {
             String diasRest = ajustarAncho(diasRestantes, 10);
 
             String caducidad = ajustarAncho(p.getCaducidadProducto().toString(), 10);
-            String reabastecer = ajustarAncho(p.getStockProducto() < 2 ? "SÍ ⚠️" : "NO", 11);
+            String reabastecer = ajustarAncho(p.getStockProducto() < 2 ? "SI" : "NO", 11);
 
-            System.out.println("║ " + codigo + " │ " + nombre + " │ " + tipo + " │ " + precio + " │ " + stock + " │ " + caducidad + " │ " + diasRest + " │ " + reabastecer + " ║");
+            System.out.println(" " + codigo + " | " + nombre + " | " + tipo + " | " + precio + " | " + stock + " | " + caducidad + " | " + diasRest + " | " + reabastecer + " ");
         }
 
-        System.out.println("╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣");
-        System.out.println("║ ESTADÍSTICAS DEL INVENTARIO                                                                                               ║");
-        System.out.println("╠════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣");
-        System.out.println("║ Total de productos diferentes: " + ajustarAncho(String.valueOf(totalProductos), 89) + "║");
-        System.out.println("║ Total de unidades en stock: " + ajustarAncho(String.valueOf(espacioDisponible), 92) + "║");
-        System.out.println("║ Costo total del inventario: $" + ajustarAncho(String.format("%.2f", costosInv), 90) + "║");
-        System.out.println("║ Ganancias totales acumuladas: $" + ajustarAncho(String.format("%.2f", gananciasTotales), 87) + "║");
-        System.out.println("╚════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝");
+        System.out.println("============================================================================================================================");
+        System.out.println(" ESTADISTICAS DEL INVENTARIO                                                                                               ");
+        System.out.println("============================================================================================================================");
+        System.out.println(" Total de productos diferentes: " + ajustarAncho(String.valueOf(totalProductos), 89) + "");
+        System.out.println(" Total de unidades en stock: " + ajustarAncho(String.valueOf(espacioDisponible), 92) + "");
+        System.out.println(" Costo total del inventario: $" + ajustarAncho(String.format("%.2f", costosInv), 90) + "");
+        System.out.println(" Ganancias totales acumuladas: $" + ajustarAncho(String.format("%.2f", gananciasTotales), 87) + "");
+        System.out.println("============================================================================================================================");
 
         // Alertas de productos con stock bajo
-        System.out.println("\n⚠️  PRODUCTOS CON STOCK BAJO (< 2 unidades):");
+        System.out.println("\nPRODUCTOS CON STOCK BAJO (< 2 unidades):");
         boolean hayStockBajo = false;
         for (Producto p : productos) {
             if (p.getStockProducto() < 2) {
@@ -361,11 +320,11 @@ public class Inventario {
             }
         }
         if (!hayStockBajo) {
-            System.out.println("   ✓ No hay productos con stock bajo");
+            System.out.println("   [OK] No hay productos con stock bajo");
         }
 
-        // Alertas de productos próximos a caducar (menos de 7 días)
-        System.out.println("\n⏰ PRODUCTOS PRÓXIMOS A CADUCAR (menos de 7 días):");
+        // Alertas de productos proximos a caducar (menos de 7 dias)
+        System.out.println("\n[!] PRODUCTOS PROXIMOS A CADUCAR (menos de 7 dias):");
         boolean hayCaducando = false;
         for (Producto p : productos) {
             if (p.getFechaCaducidad() != null) {
@@ -380,57 +339,55 @@ public class Inventario {
             }
         }
         if (!hayCaducando) {
-            System.out.println("   ✓ No hay productos próximos a caducar");
+            System.out.println("   [OK] No hay productos proximos a caducar");
         }
         System.out.println();
     }
 
     /**
-     * Muestra todos los productos del inventario con sus detalles completos
-     * NOTA: Ya existe verInventarioCompleto() de tus compañeros.
-     * Este método ofrece una vista alternativa más detallada.
+     * Muestra el inventario con todos los detalles de cada producto
      */
     public static void verInventario() {
         List<Producto> productos = Producto.getListaProductos();
 
         if (productos.isEmpty()) {
-            System.out.println("El inventario está vacío");
+            System.out.println("El inventario esta vacio");
             return;
         }
 
-        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║               LISTADO COMPLETO DE PRODUCTOS                    ║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝\n");
+        System.out.println("\n================================================================");
+        System.out.println("               LISTADO COMPLETO DE PRODUCTOS                    ");
+        System.out.println("================================================================\n");
 
         int contador = 1;
         for (Producto p : productos) {
-            System.out.println("┌─────────────────────────────────────────────────────────────┐");
-            System.out.println("│ PRODUCTO #" + contador);
-            System.out.println("├─────────────────────────────────────────────────────────────┤");
-            System.out.println("│ Código:           " + p.getCodigoProducto());
-            System.out.println("│ Nombre:           " + p.getNombreProducto());
-            System.out.println("│ Tipo:             " + p.getTipoProducto());
-            System.out.println("│ Precio:           $" + String.format("%.2f", p.getPrecioProducto()));
-            System.out.println("│ Costo:            $" + String.format("%.2f", p.getCostoProducto()));
-            System.out.println("│ Stock:            " + p.getStockProducto() + " unidades");
-            System.out.println("│ Caducidad:        " + p.getCaducidadProducto());
+            System.out.println("-------------------------------------------------------------");
+            System.out.println(" PRODUCTO #" + contador);
+            System.out.println("-------------------------------------------------------------");
+            System.out.println(" Codigo:           " + p.getCodigoProducto());
+            System.out.println(" Nombre:           " + p.getNombreProducto());
+            System.out.println(" Tipo:             " + p.getTipoProducto());
+            System.out.println(" Precio:           $" + String.format("%.2f", p.getPrecioProducto()));
+            System.out.println(" Costo:            $" + String.format("%.2f", p.getCostoProducto()));
+            System.out.println(" Stock:            " + p.getStockProducto() + " unidades");
+            System.out.println(" Caducidad:        " + p.getCaducidadProducto());
 
             if (p.getFechaCaducidad() != null) {
-                System.out.println("│ Fecha Caducidad:  " + p.getFechaCaducidad());
+                System.out.println(" Fecha Caducidad:  " + p.getFechaCaducidad());
                 long diasRestantes = ChronoUnit.DAYS.between(LocalDate.now(), p.getFechaCaducidad());
                 if (diasRestantes >= 0) {
-                    System.out.println("│ Días restantes:   " + diasRestantes + " días");
+                    System.out.println(" Dias restantes:   " + diasRestantes + " dias");
                 } else {
-                    System.out.println("│ Estado:           ¡CADUCADO!");
+                    System.out.println(" Estado:           CADUCADO!");
                 }
             }
 
             if (p.getProveedor() != null) {
-                System.out.println("│ Proveedor:        " + p.getProveedor().getNombreProveedor());
-                System.out.println("│ Tel. Proveedor:   " + p.getProveedor().getTelefonoProveedor());
+                System.out.println(" Proveedor:        " + p.getProveedor().getNombreProveedor());
+                System.out.println(" Tel. Proveedor:   " + p.getProveedor().getTelefonoProveedor());
             }
 
-            System.out.println("└─────────────────────────────────────────────────────────────┘\n");
+            System.out.println("-------------------------------------------------------------\n");
             contador++;
         }
 
@@ -438,38 +395,33 @@ public class Inventario {
     }
 
     /**
-     * Busca un producto por su código
-     * NOTA: Alias de buscarProducto() para mantener compatibilidad con la especificación
-     * @param codigoProducto El código del producto a buscar
-     * @return El producto encontrado o null si no existe
+     * Busca un producto por su codigo
      */
     public static Producto busquedaCode(String codigoProducto) {
         return buscarProducto(codigoProducto);
     }
 
     /**
-     * Busca productos por nombre (búsqueda parcial)
-     * NOTA: Versión mejorada que muestra múltiples resultados
-     * @param nombreProducto El nombre o parte del nombre del producto a buscar
+     * Busca y muestra todos los productos que coincidan con el nombre ingresado
      */
     public static void busquedaNombre(String nombreProducto) {
         List<Producto> productos = Producto.getListaProductos();
         boolean encontrado = false;
 
-        System.out.println("\n╔════════════════════════════════════════════════════════════════╗");
-        System.out.println("║           RESULTADOS DE BÚSQUEDA POR NOMBRE                    ║");
-        System.out.println("║ Búsqueda: " + ajustarAncho(nombreProducto, 53) + "║");
-        System.out.println("╚════════════════════════════════════════════════════════════════╝\n");
+        System.out.println("\n================================================================");
+        System.out.println("           RESULTADOS DE BUSQUEDA POR NOMBRE                    ");
+        System.out.println(" Busqueda: " + ajustarAncho(nombreProducto, 53) + "");
+        System.out.println("================================================================\n");
 
         for (Producto p : productos) {
             if (p.getNombreProducto().toLowerCase().contains(nombreProducto.toLowerCase())) {
-                System.out.println("┌─────────────────────────────────────────────────────────────┐");
-                System.out.println("│ Código:    " + p.getCodigoProducto());
-                System.out.println("│ Nombre:    " + p.getNombreProducto());
-                System.out.println("│ Tipo:      " + p.getTipoProducto());
-                System.out.println("│ Precio:    $" + String.format("%.2f", p.getPrecioProducto()));
-                System.out.println("│ Stock:     " + p.getStockProducto() + " unidades");
-                System.out.println("└─────────────────────────────────────────────────────────────┘\n");
+                System.out.println("-------------------------------------------------------------");
+                System.out.println(" Codigo:    " + p.getCodigoProducto());
+                System.out.println(" Nombre:    " + p.getNombreProducto());
+                System.out.println(" Tipo:      " + p.getTipoProducto());
+                System.out.println(" Precio:    $" + String.format("%.2f", p.getPrecioProducto()));
+                System.out.println(" Stock:     " + p.getStockProducto() + " unidades");
+                System.out.println("-------------------------------------------------------------\n");
                 encontrado = true;
             }
         }
@@ -480,10 +432,7 @@ public class Inventario {
     }
 
     /**
-     * Método auxiliar para ajustar el ancho de las cadenas en las tablas
-     * @param texto El texto a ajustar
-     * @param ancho El ancho deseado
-     * @return El texto ajustado con espacios
+     * Ajusta el ancho de texto para formato de tablas
      */
     private static String ajustarAncho(String texto, int ancho) {
         if (texto.length() > ancho) {

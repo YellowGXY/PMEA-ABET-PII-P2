@@ -121,7 +121,6 @@ public class Producto {
     
     /**
      * Metodo para agregar un nuevo producto a la lista de productos
-     * El producto a agregar
      */
     public static void addProductos(Producto producto) {
         // Verificar si el producto es nulo
@@ -144,7 +143,6 @@ public class Producto {
     
     /**
      * Metodo para eliminar un producto de la lista por su código
-     * El código del producto a eliminar
      */
     public static void deleteProducto(String codigoProducto) {
         for (int i = 0; i < listaProductos.size(); i++) {
@@ -159,7 +157,6 @@ public class Producto {
     
     /**
      * Metodo para editar un producto existente
-     * El código del producto a editar
      */
     public static void editarProducto(String codigoProducto, Producto nuevoProducto) {
         for (int i = 0; i < listaProductos.size(); i++) {
